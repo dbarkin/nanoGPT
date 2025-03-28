@@ -13,6 +13,27 @@ Because the code is so simple, it is very easy to hack to your needs, train new 
 
 ```
 pip install torch numpy transformers datasets tiktoken wandb tqdm
+
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+Add-Content -Path $PROFILE -Value '(& uv generate-shell-completion powershell) | Out-String | Invoke-Expression'
+$env:Path = "C:\Users\dimab\.local\bin;$env:Path"
+uv init --python 3.13
+uv venv --python 3.13       
+.venv\Scripts\activate
+$env:UV_TORCH_BACKEND = "auto" 
+
+add  to pyproject.toml
+[tool.uv]
+preview = true
+
+
+uv pip install "torch<=2.6,>=2.0" --torch-backend=auto --preview
+uv add torch 
+uv add numpy transformers datasets tiktoken wandb tqdm tensorflow
+
+uv run data/shakespeare_char/prepare.py
+uv run train.py config/train_shakespeare_char.py --device=cpu --compile=False --eval_iters=20 --log_interval=1 --block_size=64 --batch_size=12 --n_layer=4 --n_head=4 --n_embd=128 --max_iters=2000 --lr_decay_iters=2000 --dropout=0.0
+uv run sample.py --out_dir=out-shakespeare-char --device=cpu
 ```
 
 Dependencies:
